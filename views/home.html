@@ -5,7 +5,14 @@
 {% block content %}
 	<h1>Current list</h1>
 	<div class='row marketing'>
-
+	<div style='font-size: 22px; font-weight: 600;'>
+		<div class='col-md-2'> Title of book </div>
+		<div class='col-md-2'> Author </div>
+		<div class='col-md-2'> Year </div>
+		<div class='col-md-2'> Rating </div> 
+		<div class='col-md-2'> - </div> 
+		<div class='col-md-2'> - </div> 
+		</div>
 	{% for book in books %}
 		<div class='col-md-2'> {{ book.title }} </div>
 		<div class='col-md-2'> {{ book.author }} </div>
@@ -16,7 +23,7 @@
 			<a href="/book/{{ book._id.toString() }}">Edit</a>
 			</div>
 		<div class='col-md-2'>
-        	<a href="/book/delete/{{ book._id.toString() }}">Delete</a>
+        	<a href="/book/remove/{{ book._id.toString() }}">Delete</a>
     	</div>
 		{% endfor %}
 	</div>

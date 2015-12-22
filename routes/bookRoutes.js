@@ -44,3 +44,8 @@ module.exports.addNewBook = function *(){
 
 	this.redirect('/');
 };
+
+module.exports.removeBook = function *(id){
+	yield books.remove({_id: id});
+	this.redirect('/');
+};
