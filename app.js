@@ -1,6 +1,7 @@
 var app = module.exports = require('koa')();
 var route = require('koa-route');
 var serve = require('koa-static');
+var render = require("./lib/render.js");
 
 app.use(serve('./public'));
 
@@ -14,6 +15,10 @@ app.use(route.get('/book/:id', bookRoutes.showBook));
 app.use(route.post('/book/:id', bookRoutes.updateBook));
 app.use(route.get('/book/remove/:id', bookRoutes.removeBook));
 
+app.use(function *(){
+  //this.body = 'Invalid URL!!!';
+  this.body = yield render("error");
+});
 
 app.listen(3000);
 console.log('Server is started at port 3000');
