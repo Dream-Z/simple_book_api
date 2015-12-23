@@ -7,8 +7,10 @@ var mongoose = require('mongoose');
 var books = mongoose.model('books');
 var testHelper = require('./testHelper.js');
 
-
-describe("Home page", function(){
+describe("Book site", function(){
+	var test_book = {title: "New book", author: "test author", year: 2000, rating: 15};
+	var test_book_2 = {title: "book_2", author: "test_author2", year: 2011, rating: 115};
+	var test_book_3 = {title: "bookkkkkkkk", author: "test_author2", year: 2011, rating: 115};
 
 	beforeEach(function(done){
 		testHelper.removeAllBooks();
@@ -20,7 +22,7 @@ describe("Home page", function(){
 		done();
 	});
 
-	it("display without errors", function(done){
+	it("Home page: display without errors", function(done){
 		request
 			.get('/')
 			.expect(200)
@@ -28,18 +30,97 @@ describe("Home page", function(){
 			.end(done);
 	});
 
-	it("list all books in the database", function (done) {
-		new books({title: "New book", author: "test author", year: 2000, rating: 15}).save();
-		new books({title: "Old book", author: "old author", year: 1980, rating: 35}).save();
+	it("Home page: list all books in the database", function (done) {
+		new books(test_book).save();
+		new books(test_book_2).save();
 		
 		request
-			.get("/")
+			.get('/')
 			.expect(200)
 			.expect(function(res){
 				res.text.should.containEql("New book");
-				res.text.should.containEql("Old book");
+				res.text.should.containEql("book_2");
 			})
 			.end(done);
+	});
+
+	it("Edit page: display without errors", function(done){
+		new books(test_book).save();
+		
+		books.find({title: 'New book'}, function(err, data){
+			if(err) throw err;
+			else {
+				var id = data[0]._id;
+				var get_link = '/book/'+ id;
+				request
+					.get(get_link)
+					.expect(200)
+					.expect('Content-Type', /html/)
+					.expect(function(res){
+						res.text.should.containEql("New book");
+					})
+					.end(done);
+			}
 		});
 	});
 
+	it("Edit page: functionality works properly", function(done){
+		new books(test_book).save();
+		
+		books.find({title: 'New book'}, function(err, data){
+			if(err) throw err;
+			else {
+				var id = data[0]._id;
+				var get_link = '/book/'+ id;
+				request
+					.get(get_link)
+					.send({title : 'strange title', author : 'strange author', year : 2013, rating: '200'})
+					.expect(200)
+					.end(function(err, res){
+						var string = JSON.stringify(res);
+						if (string.indexOf('strange title') > -1)
+							done();
+					});
+				}
+		});
+	});
+
+	it("New book page: display without errors", function(done){
+		request
+			.get('/book')
+			.expect(200)
+			.expect('Content-Type', /html/)
+			.end(done);
+	});
+
+	it("Error page: display without errors", function(done){
+		request
+			.get('/asdasd')
+			.expect(200)
+			.expect('Content-Type', /html/)
+			.expect(function(res){
+				res.text.should.containEql("Sorry, you're insert invalid url");
+			})
+			.end(done);
+	});
+
+	it("Delete book: successfuly deleted", function(done){
+		new books(test_book_3).save();
+		
+		books.find({title: 'bookkkkkkkk'}, function(err, data){
+			if(err) throw err;
+			else {
+				var id = data[0]._id;
+				var get_link = '/book/remove/'+ id;
+				request
+					.get(get_link)
+					.expect('Content-Type', /html/)
+					.end(function(err, res){
+						if(err) throw err;
+						else done();
+					})
+				}
+		});
+	});
+
+});

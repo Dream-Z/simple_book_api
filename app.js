@@ -16,7 +16,6 @@ app.use(route.post('/book/:id', bookRoutes.updateBook));
 app.use(route.get('/book/remove/:id', bookRoutes.removeBook));
 
 app.use(function *(){
-  //this.body = 'Invalid URL!!!';
   this.body = yield render("error");
 });
 
